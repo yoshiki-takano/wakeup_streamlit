@@ -9,8 +9,8 @@ jobs:
   wake:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4          # ← 必須。これが抜けていました
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v5          # ← 必須。これが抜けていました
+      - uses: actions/setup-python@v6
         with: { python-version: "3.12" }
       - run: pip install playwright && playwright install --with-deps chromium
       - run: python wake.py
