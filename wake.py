@@ -8,7 +8,12 @@ from playwright.sync_api import sync_playwright
 
 URLS = [u for u in re.split(r"[,\s]+", os.environ.get("APP_URL", "")) if u]
 WAKE_BUTTON = '[data-testid="wakeup-button-viewer"], [data-testid="wakeup-button-owner"]'
-APP_CONTAINER = '[data-testid="stAppViewContainer"]'
+APP_READY = (
+    '[data-testid="stAppViewContainer"], '
+    '[data-testid="stApp"], '
+    '[data-testid="stAppViewBlockContainer"], '
+    'div.stApp, section.main'
+)
 SHOT_DIR = Path("screenshots")
 
 UA = (
@@ -18,7 +23,9 @@ UA = (
 
 
 def visit(page, url: str) -> str:
-    page.goto(url, wait_until="domcontentloaded", timeout=120_000)
+    response = page.goto(url, wait_until="domcontentloaded", timeout=120_000)
+    if response is not None and response.status >= 400:
+        raise RuntimeError(f"HTTP {response.status}")
 
     # 画面は JS 描画後に現れるので、ボタンの有無は明示的に待ってから判定する
     try:
@@ -32,7 +39,11 @@ def visit(page, url: str) -> str:
         page.wait_for_selector(WAKE_BUTTON, state="detached", timeout=300_000)
         state = "woken-up"
 
-    page.wait_for_selector(APP_CONTAINER, timeout=300_000)
+    try:
+        page.wait_for_selector(APP_READY, timeout=60_000)
+    except PlaywrightTimeoutError:
+        # Streamlit 側の DOM 変更で selector が外れても、sleep 解除を優先判定する
+        pass
     page.wait_for_timeout(20_000)  # セッション登録のため滞在
 
     if page.query_selector(WAKE_BUTTON):
