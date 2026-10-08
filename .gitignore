@@ -1,2 +1,4 @@
 settings.json
 secrets/
+__pycache__/
+*.pyc
