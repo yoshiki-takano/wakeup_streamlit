@@ -1,7 +1,7 @@
 name: keepalive
 on:
   schedule:
-    - cron: "0 */3 * * *"      # UTC基準。cronは遅延・スキップがあるため間隔を短めに
+    - cron: "17 */5 * * *"      # UTC基準。cronは遅延・スキップがあるため間隔を短めに
   workflow_dispatch:            # 手動実行用
 permissions:
   contents: write               # ハートビートcommit用
