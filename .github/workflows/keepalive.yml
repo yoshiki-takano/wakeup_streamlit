@@ -18,7 +18,7 @@ jobs:
           APP_URL: ${{ secrets.STREAMLIT_APP_URL }}
       - name: upload failure screenshots
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: screenshots
           path: screenshots/
